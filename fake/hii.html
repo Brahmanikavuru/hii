@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            font-family: Arial, sans-serif;
+        }
+        .card {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .fake {
+            color: red;
+        }
+        .real {
+            color: green;
+        }
+    </style>
+    <script>
+        async function checkNews() {
+            const inputText = document.getElementById('news-input').value;
+            const resultElement = document.getElementById('result');
+            if (!inputText) return;
+            resultElement.textContent = 'Checking...';
+            try {
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: inputText })
+                });
+                const data = await response.json();
+                resultElement.textContent = data.result === 'Fake' ? '⚠️ Fake News!' : '✅ Real News!';
+                resultElement.className = data.result === 'Fake' ? 'result fake' : 'result real';
+            } catch (error) {
+                resultElement.textContent = 'Error checking news';
+                resultElement.className = 'result fake';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="card">
+        <h1>Fake News Detector</h1>
+        <label for="news-input">Enter News Text or URL:</label>
+        <input type="text" id="news-input" class="input" placeholder="Enter text or URL">
+        <button class="button" onclick="checkNews()">Check News</button>
+        <p id="result" class="result"></p>
+    </div>
+</body>
+</html>
